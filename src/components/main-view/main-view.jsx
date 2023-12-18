@@ -1,70 +1,76 @@
-import { useState } from "react";
-import { MovieCard } from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
+import { useState, useEffect } from "react";
+import MovieCard from "../movie-card/movie-card";
+import MovieView from "../movie-view/movie-view";
 
 const MainView = () => {
-  const [movies, setMovies] = useState([
-    {
-        id: 1,
-        image: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
-        Title: 'Inception',
-        Description: 'A thief who enters the dreams of others to steal their secrets is given one last job.',
-        Director: {
-          Name: 'Christopher Nolan',
-          Bio: 'Christopher Nolan is a British-American director, well known for his work in the action and superhero genres.'
-        },
-        Genre: {
-          Name: 'Sci-Fi',
-          Description: 'Science fiction movies explore futuristic and speculative concepts.'
-        },
-        Featured: true,
-        ReleaseYear: 2010,
-        Rating: 8.8
-      },
-      {
-        id: 2,
-        image: 'https://m.media-amazon.com/images/I/61jkTiX8NuL._AC_UF1000,1000_QL80_.jpg',
-        Title: 'The Lion King',
-        Description: 'A young lion prince flees his kingdom after the murder of his father and must learn to survive on the streets of the city.',
-        Director: {
-          Name: 'Roger Allers',
-          Bio: 'Roger Allers is an American director known for his work in the animation and family genres.'
-        },
-        Genre: {
-          Name: 'Animation',
-          Description: 'Animation movies appeal to all ages with their vibrant characters and stories.'
-        },
-        Featured: false,
-        ReleaseYear: 1994,
-        Rating: 8.5
-      },
-      {
-        id: 3,
-        image: 'https://m.media-amazon.com/images/M/MV5BNjNhZTk0ZmEtNjJhMi00YzFlLWE1MmEtYzM1M2ZmMGMwMTU4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',
-        Title: 'The Silence of the Lambs',
-        Description: 'A young FBI cadet must receive the help of an incarcerated and manipulative cannibal killer to help catch another serial killer, a madman who skins his victims.',
-        Director: {
-          Name: 'Jonathan Demme',
-          Bio: 'Jonathan Demme was an American director known for his work in the crime and thriller genres.'
-        },
-        Genre: {
-          Name: 'Thriller',
-          Description: 'Thriller movies create suspense and excitement.'
-        },
-        Featured: false,
-        ReleaseYear: 1991,
-        Rating: 8.6
-      }
-  ]);
+  const [movies, setMovies] = useState([]);
 
   const [selectedMovie, setSelectedMovie] = useState(null);
 
+  useEffect(() => {
+    fetch("https://ifdbase-c6a1086fce3e.herokuapp.com/movies")
+      .then((response) => response.json())
+      .then((data) => {
+        const moviesFromApi = data.map((movie) => {
+          return {
+            id: movie._id,
+            title: movie.Title,
+            image: `https://i0.wp.com/capri.org.au/wp-content/uploads/2017/10/poster-placeholder.jpg?ssl=1`,
+            genre: movie.Genre,
+            director: movie.Director,
+            releaseYear: movie.ReleaseYear,
+            rating: movie.Rating,
+            featured: movie.Featured,
+          };
+        });
+
+        setMovies(moviesFromApi);
+      });
+  }, []);
+
   if (selectedMovie) {
+
+    let similarMovies = movies.filter((movie) => { //array of movies with the same genre
+      for (let i = 0; i < 3; i++) { //only show up to 3 movies
+        if (
+          movie.genre.Name == selectedMovie.genre.Name &&
+          movie.title != selectedMovie.title
+        ) {
+          return true;
+        }
+      }
+    });
+
+    // if (similarMovies.length > 3) {
+    //   similarMovies = similarMovies.slice(0, 4);
+    // }
+
+    if (!similarMovies.length) {
+      similarMovies = ["No similar movies found"]
+    }
+
+    console.log(similarMovies);
+
     return (
-      <MovieView
-        movieData={selectedMovie}
-        onBackClick={() => setSelectedMovie(null)}
-      />
+      <>
+        <MovieView
+          movieData={selectedMovie}
+          onBackClick={() => setSelectedMovie(null)}
+        />
+        <hr />
+        <h2>Similar Movies</h2>
+        <div>
+          {similarMovies.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movieData={movie}
+              onMovieClick={(newSelectedMovie) => {
+                setSelectedMovie(newSelectedMovie);
+              }}
+            />
+          ))}
+        </div>
+      </>
     );
   }
 

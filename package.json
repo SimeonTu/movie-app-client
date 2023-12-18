@@ -12,7 +12,9 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@parcel/transformer-js": "^2.10.3",
     "@parcel/transformer-sass": "^2.10.3",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "prop-types": "^15.8.1"
   }
 }
