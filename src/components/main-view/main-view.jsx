@@ -1,89 +1,164 @@
-import { useState } from "react";
-import { MovieCard } from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
+import { useState, useEffect } from "react";
+import MovieCard from "../movie-card/movie-card";
+import MovieView from "../movie-view/movie-view";
+import LoginView from "../login-view/login-view";
+import SignupView from "../signup-view/signup-view";
+import { Row, Col, Button } from "react-bootstrap";
 
 const MainView = () => {
-  const [movies, setMovies] = useState([
-    {
-        id: 1,
-        image: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
-        Title: 'Inception',
-        Description: 'A thief who enters the dreams of others to steal their secrets is given one last job.',
-        Director: {
-          Name: 'Christopher Nolan',
-          Bio: 'Christopher Nolan is a British-American director, well known for his work in the action and superhero genres.'
-        },
-        Genre: {
-          Name: 'Sci-Fi',
-          Description: 'Science fiction movies explore futuristic and speculative concepts.'
-        },
-        Featured: true,
-        ReleaseYear: 2010,
-        Rating: 8.8
-      },
-      {
-        id: 2,
-        image: 'https://m.media-amazon.com/images/I/61jkTiX8NuL._AC_UF1000,1000_QL80_.jpg',
-        Title: 'The Lion King',
-        Description: 'A young lion prince flees his kingdom after the murder of his father and must learn to survive on the streets of the city.',
-        Director: {
-          Name: 'Roger Allers',
-          Bio: 'Roger Allers is an American director known for his work in the animation and family genres.'
-        },
-        Genre: {
-          Name: 'Animation',
-          Description: 'Animation movies appeal to all ages with their vibrant characters and stories.'
-        },
-        Featured: false,
-        ReleaseYear: 1994,
-        Rating: 8.5
-      },
-      {
-        id: 3,
-        image: 'https://m.media-amazon.com/images/M/MV5BNjNhZTk0ZmEtNjJhMi00YzFlLWE1MmEtYzM1M2ZmMGMwMTU4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',
-        Title: 'The Silence of the Lambs',
-        Description: 'A young FBI cadet must receive the help of an incarcerated and manipulative cannibal killer to help catch another serial killer, a madman who skins his victims.',
-        Director: {
-          Name: 'Jonathan Demme',
-          Bio: 'Jonathan Demme was an American director known for his work in the crime and thriller genres.'
-        },
-        Genre: {
-          Name: 'Thriller',
-          Description: 'Thriller movies create suspense and excitement.'
-        },
-        Featured: false,
-        ReleaseYear: 1991,
-        Rating: 8.6
-      }
-  ]);
-
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(storedUser ? storedUser : null);
+  const [token, setToken] = useState(storedToken ? storedToken : null);
+  const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  if (selectedMovie) {
-    return (
-      <MovieView
-        movieData={selectedMovie}
-        onBackClick={() => setSelectedMovie(null)}
-      />
-    );
-  }
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
 
-  if (movies.length === 0) {
-    return <div>The list is empty!</div>;
+    async function fetchData() {
+      const moviesFromApi = await fetch("https://ifdbase-c6a1086fce3e.herokuapp.com/movies", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          return data.map((movie) => {
+            return {
+              id: movie._id,
+              title: movie.Title,
+
+              genre: movie.Genre,
+              director: movie.Director,
+              releaseYear: movie.ReleaseYear,
+              rating: movie.Rating,
+              featured: movie.Featured,
+            };
+          });
+        });
+
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MTI4MTNmMzRhNWFiYzdjYmU0YjE1NzZkMGIyYmY1MSIsInN1YiI6IjY1OGYzZmUwZDUxOTFmNmExZDI3MDcwZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Ybplmx9CH6yhdA36BEjUrppLyGMMPtjLxPy1cU-Z_c4'
+        }
+      };
+
+      moviesFromApi.map((movie) => {
+        fetch(`https://api.themoviedb.org/3/search/movie?query=${movie.title}&language=en-US&page=1`, options)
+          .then(response => response.json())
+          .then(data => {
+            movie.image = `http://image.tmdb.org/t/p/w500${data.results[0].poster_path}`
+          })
+      })
+
+
+      console.log(moviesFromApi);
+
+      setMovies(moviesFromApi);
+
+    }
+
+    fetchData()
+
+  }, [token]);
+
+  // Function to check for similar movies after a movie card is opened
+  const similarMovies = (selectedMovie) => {
+
+    //array of movies with the same genre
+    let similarMoviesArr = movies.filter((movie) => {
+      for (let i = 0; i < 3; i++) { //only show up to 3 movies
+        if (
+          movie.genre.Name == selectedMovie.genre.Name &&
+          movie.title != selectedMovie.title
+        ) return true;
+      }
+    })
+
+    if (!similarMoviesArr.length) {
+      return ["No similar movies found"]
+    } else {
+      return similarMoviesArr
+    }
+
   }
 
   return (
-    <div>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movieData={movie}
-          onMovieClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie);
-          }}
-        />
-      ))}
-    </div>
+    <Row className="justify-content-md-center">
+      {!user ? (
+
+        <Col md={5}>
+          <b>Login</b>
+          <LoginView onLoggedIn={(user, token) => {
+            setUser(user);
+            setToken(token);
+          }} />
+          <br></br>
+          <b>Register</b>
+          <SignupView />
+        </Col>
+
+
+      ) : selectedMovie ? (
+
+        <>
+          <Col className="my-auto" md={8} style={{ border: "1px solid black" }}>
+            <MovieView
+              style={{ border: "1px solid green" }}
+              movieData={selectedMovie}
+              onBackClick={() => setSelectedMovie(null)}
+            />
+          </Col>
+          <hr />
+          <h2>Similar Movies</h2>
+          <div>
+            {similarMovies(selectedMovie).map((movie) => (
+              <MovieCard
+                key={movie.id}
+                movieData={movie}
+                onMovieClick={(newSelectedMovie) => {
+                  setSelectedMovie(newSelectedMovie);
+                }}
+              />
+            ))}
+          </div>
+        </>
+
+      ) : movies.length === 0 ? (
+
+        <div>The list is empty!</div>
+
+      ) : (
+
+        // Main view with book list
+        <>
+          <Row className="justify-content-md-end">
+            <Button style={{ width: "150px", height: "40px" }} variant="secondary" onClick={() => {
+              setUser(null)
+              setToken(null)
+              localStorage.clear()
+            }}
+            >Logout
+            </Button>
+          </Row>
+          {movies.map((movie) => (
+            <Col key={movie.id} md={3}>
+              <MovieCard
+                key={movie.id}
+                movieData={movie}
+                onMovieClick={(newSelectedMovie) => {
+                  setSelectedMovie(newSelectedMovie);
+                }}
+              />
+            </Col>
+          ))}
+        </>
+      )}
+
+    </Row>
   );
 };
 
