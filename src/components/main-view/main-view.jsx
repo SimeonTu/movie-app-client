@@ -19,7 +19,7 @@ const MainView = () => {
     }
 
     async function fetchData() {
-      const moviesFromApi = await fetch("https://ifdbase-c6a1086fce3e.herokuapp.com/movies", {
+      let moviesFromApi = await fetch("https://ifdbase-c6a1086fce3e.herokuapp.com/movies", {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then((response) => response.json())
@@ -38,7 +38,8 @@ const MainView = () => {
           });
         });
 
-      const options = {
+      // The Film Database API call options
+      const TFDBoptions = {
         method: 'GET',
         headers: {
           accept: 'application/json',
@@ -46,18 +47,28 @@ const MainView = () => {
         }
       };
 
-      moviesFromApi.map((movie) => {
-        fetch(`https://api.themoviedb.org/3/search/movie?query=${movie.title}&language=en-US&page=1`, options)
+      // Fetching movie posters from TFDB and adding them to each movie object, then setting the value of the "movies" state to the finished object
+      console.time("promise all");
+      moviesFromApi = await Promise.all(moviesFromApi.map(async (movie) => {
+        await fetch(`https://api.themoviedb.org/3/search/movie?query=${movie.title}&language=en-US&page=1`, TFDBoptions)
           .then(response => response.json())
           .then(data => {
             movie.image = `http://image.tmdb.org/t/p/w500${data.results[0].poster_path}`
           })
+      })).then(() => {
+        console.log(moviesFromApi)  
+        setMovies(moviesFromApi)
       })
+      console.timeEnd("promise all")
 
+      // .then(setMovies(moviesFromApi));
 
       console.log(moviesFromApi);
 
-      setMovies(moviesFromApi);
+      // setInterval(() => {
+      //   setMovies(moviesFromApi);
+      // }, 50)
+
 
     }
 
@@ -91,13 +102,10 @@ const MainView = () => {
       {!user ? (
 
         <Col md={5}>
-          <b>Login</b>
           <LoginView onLoggedIn={(user, token) => {
             setUser(user);
             setToken(token);
           }} />
-          <br></br>
-          <b>Register</b>
           <SignupView />
         </Col>
 
@@ -145,7 +153,7 @@ const MainView = () => {
             </Button>
           </Row>
           {movies.map((movie) => (
-            <Col key={movie.id} md={3}>
+            <Col key={movie.id} md={3} className="mb-5">
               <MovieCard
                 key={movie.id}
                 movieData={movie}
