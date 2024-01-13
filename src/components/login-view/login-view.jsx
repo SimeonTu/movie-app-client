@@ -44,12 +44,12 @@ const LoginView = ({ onLoggedIn }) => {
             <Row>
                 <Col>
                     <CardGroup>
-                        <Card>
+                        <Card className="mt-5">
                             <Card.Body>
-                                <Card.Title>Login</Card.Title>
+                                <Card.Title className="mb-3">Login</Card.Title>
                                 <Form onSubmit={handleSubmit}>
                                     <Form.Group controlId="formUsernameLogin">
-                                        <Form.Label>
+                                        <Form.Label className="m-0">
                                             Username:
                                         </Form.Label>
                                         <Form.Control
@@ -63,7 +63,7 @@ const LoginView = ({ onLoggedIn }) => {
                                     </Form.Group>
 
                                     <Form.Group controlId="formPassword">
-                                        <Form.Label>
+                                        <Form.Label className="mb-0 mt-2">
                                             Password:
                                         </Form.Label>
                                         <Form.Control className="mb-2"
@@ -74,7 +74,7 @@ const LoginView = ({ onLoggedIn }) => {
                                             placeholder="Enter your password"
                                         />
                                     </Form.Group>
-                                    <Button variant="primary" type="submit">Submit</Button>
+                                    <Button className="mt-3 mb-2" variant="primary" type="submit">Submit</Button>
                                 </Form>
                             </Card.Body>
                         </Card>

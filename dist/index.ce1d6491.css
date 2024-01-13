@@ -13211,29 +13211,6 @@ img {
 }
 
 :root {
-  --toastify-color-success: #004f00 !important;
-  --toastify-text-color-light: SeaGreen !important;
-  --toastify-color-light: honeydew !important;
-}
-
-.Toastify__toast {
-  border: .5px solid #2e8b5726;
-  box-shadow: 0 0 50px #0000001a, 0 0 25px #0000000d !important;
-}
-
-.Toastify__toast--warning {
-  color: #473900 !important;
-}
-
-.profile-header {
-  color: #2e8b57;
-}
-
-.invalid-feedback {
-  color: #dc3545;
-}
-
-:root {
   --toastify-color-light: #fff;
   --toastify-color-dark: #121212;
   --toastify-color-info: #3498db;
@@ -13940,6 +13917,35 @@ img {
   to {
     transform: rotate(360deg);
   }
+}
+
+:root {
+  --toastify-color-success: #004f00 !important;
+  --toastify-text-color-light: SeaGreen !important;
+  --toastify-color-light: honeydew !important;
+}
+
+.modal-body, .modal-footer {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.Toastify__toast {
+  border: .5px solid #2e8b5726;
+  box-shadow: 0 0 50px #0000001a, 0 0 25px #0000000d !important;
+}
+
+.Toastify__toast--warning {
+  color: #473900 !important;
+}
+
+.profile-header {
+  color: #2e8b57;
+}
+
+.invalid-feedback {
+  color: #dc3545;
 }
 
 .react-datepicker-wrapper {

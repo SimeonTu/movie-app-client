@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Placeholder, Card, Row, Col } from 'react-bootstrap';
+import { Form, Button, Placeholder, Card, Row, Col, Modal } from 'react-bootstrap';
 import { Link, Outlet } from 'react-router-dom';
 import moment from 'moment';
 import MovieCard from '../movie-card/movie-card';
 import MovieCardPlaceholder from '../placeholders/movie-card-placeholder';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
 
 
@@ -21,6 +23,32 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
     const [loading, setLoading] = useState(true);
     const [refresh, setRefresh] = useState(true);
 
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const handleDeleteAcc = () => {
+        fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                setShow(false)
+                deleteAccToast()
+                setTimeout(onLoggedOut, 4000)
+            })
+    }
+
+    const deleteAccToast = () => {
+        toast.success(<p>Your account has been deleted and you'll be logged out shortly...</p>, {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 3500
+        });
+    }
+
 
     useEffect(() => {
 
@@ -28,17 +56,25 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
         async function bruh() {
             let userdata = await fetchUserData()
 
-            movieData = movieData.filter(movie => {
+            let movieDataFiltered = movieData.filter(movie => {
                 if (userdata.FavoriteMovies.includes(movie.id)) {
                     console.log("yep")
                     return movie
                 }
             })
-            setMovies(movieData)
+
+            setMovies(movieDataFiltered)
+
+            // if movie data has loaded, remove placeholders
+            if (movieData.length != 0) {
+                setLoading(false)
+            }
 
         }
 
         bruh();
+
+
 
         console.log(movies);
         // console.log(movieData)
@@ -64,7 +100,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
             .then((response) => response.json())
             .then((data) => {
                 setFetchedUser(data)
-                setLoading(false)
+                // setLoading(false)
                 setBirthday(data.Birthday)
                 return data
             })
@@ -88,6 +124,8 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
     return (
 
         <>
+            <ToastContainer />
+
             <h1 className='profile-header mb-4'>User Profile of <b>{user.Username}</b></h1>
 
             {changeUsername ? (
@@ -103,41 +141,66 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                 <>
 
                     <div>
-                        <Link to="change-username">
+                        <Link className='me-3' to="change-username">
                             <Button onClick={() => {
                                 setRefresh(false)
                                 setChangeUsername(true)
-                            }} className='me-3' variant="primary">
+                            }} variant="primary">
                                 Change Username
                             </Button>
                         </Link>
-                        <Link to="change-password">
+                        <Link className='me-3' to="change-password">
                             <Button onClick={() => {
                                 setRefresh(false)
                                 setChangePassword(true)
-                            }} className='me-3' variant="primary">
+                            }} variant="primary">
                                 Change Password
                             </Button>
                         </Link>
-                        <Link to="change-email">
+                        <Link className='me-3' to="change-email">
                             <Button onClick={() => {
                                 setRefresh(false)
                                 setChangeEmail(true)
-                            }} className='me-3' variant="primary">
+                            }} variant="primary">
                                 Change Email
                             </Button>
                         </Link>
-                        <Link to="change-birthday">
+                        <Link className='me-3' to="change-birthday">
                             <Button onClick={() => {
                                 setRefresh(false)
                                 setChangeBirthday(true)
-                            }} className='me-3' variant="primary">
+                            }} variant="primary">
                                 Change Birthday
                             </Button>
                         </Link>
+
+                        <Button variant="danger" onClick={handleShow}>
+                            Delete Account
+                        </Button>
+
+                        <Modal show={show} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Warning</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <center>
+                                    <p>
+                                        Are you sure you want to delete your account?<br />This decision is permanent .&deg;(ಗдಗ。)&deg;.
+                                    </p>
+                                </center>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Take me back
+                                </Button>
+                                <Button variant="danger" onClick={handleDeleteAcc}>
+                                    Yes, I'm sure
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                     </div>
 
-                    {loading || movieData.length == 0 ? (
+                    {loading ? (
                         <>
                             <Form>
                                 <Form.Group className='mt-3'>
@@ -212,16 +275,28 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
-                                        {movies.map(movie => (
-                                            <Col key={movie.id} md={3} className="mb-5">
-                                                <MovieCard
-                                                    key={movie.id}
-                                                    movieData={movie}
-                                                    onMovieClick={onMovieClick}
-                                                />
-                                            </Col>
-                                        ))
-                                        }
+                                        {movies.length == 0 ? (
+                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "435px" }}>
+                                                <span style={{ color: "gray", opacity: "0.7", fontSize: "2rem" }}>
+                                                    <i><u>Nothing but crickets here...</u></i>
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {
+                                                    movies.map(movie => (
+                                                        <Col key={movie.id} md={3} className="mb-5">
+                                                            <MovieCard
+                                                                key={movie.id}
+                                                                movieData={movie}
+                                                                onMovieClick={onMovieClick}
+                                                            />
+                                                        </Col>
+                                                    ))
+                                                }
+                                            </>
+                                        )}
+
                                     </Row>
                                 </Card.Body>
                             </Card>
