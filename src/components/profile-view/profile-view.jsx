@@ -277,7 +277,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                                     <Row>
                                         {movies.length == 0 ? (
                                             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "435px" }}>
-                                                <span style={{ color: "gray", opacity: "0.7", fontSize: "2rem" }}>
+                                                <span style={{ color: "gray", opacity: "0.5", fontSize: "2rem" }}>
                                                     <i><u>Nothing but crickets here...</u></i>
                                                 </span>
                                             </div>

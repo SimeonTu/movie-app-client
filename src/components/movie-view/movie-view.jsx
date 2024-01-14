@@ -1,58 +1,26 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { Button, Placeholder, Toast } from "react-bootstrap";
+import { Button, Placeholder, Row, Col, Card } from "react-bootstrap";
 import { useParams } from "react-router";
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular, light, thin, duotone, icon } from '@fortawesome/fontawesome-svg-core/import.macro'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./movie-view.scss";
 
-export default MovieView = ({ movieData, onBackClick, user, token }) => {
+export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick }) => {
 
   const { title } = useParams();
+  const navigate = useNavigate();
 
-  const movie = movieData.find((movie) => movie.title === title);
+  const currentMovie = movieData.find((movie) => movie.title === title);
   const [movieFavorited, setMovieFavorited] = useState(null);
-  const [showToastAdd, setShowToastAdd] = useState(false);
-  const [showToastRemove, setShowToastRemove] = useState(false);
-
-  function addToFavs() {
-
-    fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}/movies/${movie.id}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log("movie added to favorites:", data)
-        setMovieFavorited(true)
-        setShowToastRemove(false)
-        setShowToastAdd(true)
-      })
-
-  }
-
-  function removeFromFavs() {
-
-    fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}/movies/${movie.id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log("movie removed to favorites:", data)
-        setMovieFavorited(false)
-        setShowToastAdd(false)
-        setShowToastRemove(true)
-      })
-
-  }
+  const [similarMovies, setSimilarMovies] = useState("");
 
   useEffect(() => {
+
+    setMovieFavorited(null)
 
     // Getting user info
     fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
@@ -64,108 +32,210 @@ export default MovieView = ({ movieData, onBackClick, user, token }) => {
       .then((data) => {
 
         // console.log(user.FavoriteMovies)
-        if (data.FavoriteMovies.includes(movie.id)) {
+        if (data.FavoriteMovies.includes(currentMovie.id)) {
           console.log("user has movie in their favs:", data)
           setMovieFavorited(true)
+          console.log("moviefavorited:", movieFavorited);
         } else {
           setMovieFavorited(false)
+          console.log("moviefavorited:", movieFavorited);
         }
       })
 
+    if (movieData.length > 0) {
+      console.log("yessir");
+      console.log(movieData);
+      let similarMoviesArr = movieData.filter((movie) => {
+        for (let i = 0; i < 3; i++) { //only show up to 3 movies
+          if (
+            movie.genre.Name == currentMovie.genre.Name &&
+            movie.title != currentMovie.title
+          ) {
+            console.log("matched!!");
+            return true;
+          }
+        }
+      })
+      setSimilarMovies(similarMoviesArr)
+      console.log(similarMoviesArr);
+      //array of movies with the same genre
+
+    }
+
+  }, [currentMovie, movieData])
 
 
-  }, [])
+  const addToast = () => {
+    toast.success(<p className="m-0">You've successfully added <b>{currentMovie.title}</b> to your favorites!<br />
+      You can view your favorite movies from your <u><b><a style={{ cursor: "pointer" }} onClick={() => navigate("/profile")}>profile</a></b></u>.</p>, {
+      position: toast.POSITION.TOP_CENTER
+    });
+  };
+
+  const removeToast = () => {
+    toast.success(<p className="m-2">You've successfully removed <b>{currentMovie.title}</b> from your favorites!<br />
+      You can view your favorite movies from your <u><b><a style={{ cursor: "pointer" }} onClick={() => navigate("/profile")}>profile</a></b></u>.</p>, {
+      position: toast.POSITION.TOP_CENTER
+    });
+  };
+
+  function addToFavs() {
+
+    fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}/movies/${currentMovie.id}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log("movie added to favorites:", data)
+        setMovieFavorited(true)
+        addToast()
+      })
+
+  }
+
+  function removeFromFavs() {
+
+    fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}/movies/${currentMovie.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log("movie removed to favorites:", data)
+        setMovieFavorited(false)
+        removeToast()
+      })
+
+  }
+
+  function toggleRefresh() {
+    if (refresh == true) setRefresh(false)
+    if (refresh == false) setRefresh(true)
+  }
+
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-      <div>
+
+    <Col className="my-auto" md={8} style={{ display: "flex", flexDirection: "column", width: "100vw" }}>
+
+      <ToastContainer />
+
+      <div className="m-2 p-5 rounded" style={{ display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(46, 139, 87, .05)", border: "2px solid rgba(46, 139, 87, .5)", width: "100%" }}>
+
         <div>
-          <img className="movie-poster" src={movie.image} />
-        </div>
-        <div>
-          <span>Title: </span>
-          <span>{movie.title}</span>
-        </div>
-        <div>
-          <span>Description: </span>
-          <span>{movie.description}</span>
-        </div>
-        <div>
-          <span>Genre: </span>
-          <span>{movie.genre.Name}</span>
-        </div>
-        <div>
-          <span>Director: </span>
-          <span>{movie.director.Name}</span>
-        </div>
-        <div>
-          <span>Release year: </span>
-          <span>{movie.releaseYear}</span>
-        </div>
-        <div>
-          <span>Rating: </span>
-          <span>{movie.rating}</span>
+          <img className="movie-poster rounded" style={{ boxShadow: "0 0 30px rgba(0,0,0,0.25)", scale: "1.2" }} src={currentMovie.image} />
         </div>
 
-        {
-          movie.featured ? (
-            <>
-              <div>
-                <span><b>This movie is featured!</b></span>
+        <div className="ms-5" style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
+          <span style={{ color: "SeaGreen" }}>
+            <h2>
+              {currentMovie.title}
+            </h2>
+          </span>
+
+          <span style={{ width: "350px" }}>{currentMovie.description}</span>
+
+          {
+            currentMovie.featured ? (
+              <>
+                <div className="mt-2 mb-2" style={{ color: "SeaGreen", }}>
+                  <i>
+                    <span>
+                      <b>This movie is featured!</b>
+                      <FontAwesomeIcon className="ms-2" icon={icon({ name: 'star', family: 'classic', style: 'solid' })} />
+                    </span>
+                  </i>
+                </div>
+              </>
+            ) : (
+              null
+            )
+          }
+
+          <span><b>Genre:</b> {currentMovie.genre.Name}</span>
+
+          <span><b>Director:</b> {currentMovie.director.Name}</span>
+
+          <span><b>Release year:</b> {currentMovie.releaseYear}</span>
+
+          <span><b>Rating:</b> {currentMovie.rating}</span>
+
+          {
+            movieFavorited == true ? (
+              <a className="mb-3 mt-3" style={{ cursor: "pointer" }} onClick={removeFromFavs}>
+                <p className="m-0">
+                  <FontAwesomeIcon className="pe-1" style={{ color: "red" }} size="xl" icon={solid("heart")} />
+                  Remove from favorites
+                </p>
+              </a>
+            ) : movieFavorited == false ? (
+              <a className="mb-3 mt-3" style={{ cursor: "pointer" }} onClick={addToFavs}>
+                <p className="m-0">
+                  <FontAwesomeIcon className="pe-1" size="xl" icon={regular("heart")} />
+                  Add to favorites
+                </p>
+              </a>
+            ) : (
+              <div className="mb-3 mt-3">
+                <Placeholder as={"p"} animation="wave" style={{ display: "flex", width: "150px", justifyContent: "center", alignItems: "center" }} className="m-0">
+                  <FontAwesomeIcon className="pe-1" style={{ opacity: "0.25", color: "SeaGreen" }} size="xl" icon={solid("heart")} />
+                  <Placeholder style={{ width: "100%", height: "10px", opacity: "0.25", color: "SeaGreen" }} />
+                </Placeholder>
               </div>
-            </>
-          ) : (
-            null
-          )
-        }
+            )
+          }
+
+          <Button variant="primary" className="back-button mb-3" style={{ cursor: "pointer", width: "max-content" }} onClick={() => {
+            onBackClick()
+            navigate("/")
+          }}>
+
+            Back
+          </Button>
+
+
+        </div>
 
       </div>
 
-      {movieFavorited == true ? (
-        <a className="mb-3 mt-2" style={{ cursor: "pointer" }} onClick={removeFromFavs}>
-          <p className="m-0">
-            <FontAwesomeIcon className="pe-1" style={{ color: "red" }} size="xl" icon={solid("heart")} />
-            Remove from favorites
-          </p>
-        </a>
-      ) : movieFavorited == false ? (
-        <a className="mb-3 mt-2" style={{ cursor: "pointer" }} onClick={addToFavs}>
-          <p className="m-0">
-            <FontAwesomeIcon className="pe-1" size="xl" icon={regular("heart")} />
-            Add to favorites
-          </p>
-        </a>
-      ) : (
-        <div className="mb-3 mt-2">
-          <Placeholder as={"p"} animation="wave" style={{ display: "flex", width: "150px", justifyContent: "center", alignItems: "center" }} className="m-0">
-            <FontAwesomeIcon className="pe-1" style={{ opacity: "0.25", color: "SeaGreen" }} size="xl" icon={solid("heart")} />
-            <Placeholder style={{ width: "100%", height: "10px", opacity: "0.25", color: "SeaGreen" }} />
-          </Placeholder>
-        </div>
-      )}
 
+      <Card className="p-0 mt-4" style={{}} >
+        <Card.Header>
+          <h4 className="mb-1 mt-1">You might also like</h4>
+        </Card.Header>
+        <Card.Body>
+          <Row>
+            {similarMovies.length == 0 ? (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "235px" }}>
+                <span style={{ color: "gray", opacity: "0.5", fontSize: "2rem" }}>
+                  <i><u>Nothing but crickets here...</u></i>
+                </span>
+              </div>
+            ) : (
+              <>
+                {
+                  similarMovies.map((movie) => (
+                    <Col key={movie.id} md={3} className="mb-5">
+                      <MovieCard
+                        key={movie.id}
+                        movieData={movie}
+                        onMovieClick={onMovieClick}
+                      />
+                    </Col>
+                  ))
+                }
+              </>
+            )}
+          </Row>
+        </Card.Body>
+      </Card>
 
-      <Link to={"/"}>
-        <Button variant="primary" className="back-button mb-3" style={{ cursor: "pointer" }} onClick={onBackClick}>Back</Button>
-      </Link>
-
-      <Toast style={{ position: "fixed", transform: "translateY(-225px)" }} bg={"success"} onClose={() => setShowToastAdd(false)} show={showToastAdd} delay={3000} autohide>
-        <Toast.Header>
-          <FontAwesomeIcon className="pe-1" icon={solid("check")} />
-          <strong className="me-auto">Success</strong>
-        </Toast.Header>
-        <Toast.Body style={{ color: "white" }}>You've <b>added</b> {movie.title} to your favorites.</Toast.Body>
-      </Toast>
-
-      <Toast style={{ position: "fixed", transform: "translateY(-225px)" }} bg={"success"} onClose={() => setShowToastRemove(false)} show={showToastRemove} delay={3000} autohide>
-        <Toast.Header>
-          <FontAwesomeIcon className="pe-1" icon={solid("check")} />
-          <strong className="me-auto">Success</strong>
-        </Toast.Header>
-        <Toast.Body style={{ color: "white" }}>You've <b>removed</b> {movie.title} from your favorites.</Toast.Body>
-      </Toast>
-
-    </div >
+    </Col >
 
   );
 };

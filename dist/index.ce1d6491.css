@@ -13925,6 +13925,10 @@ img {
   --toastify-color-light: honeydew !important;
 }
 
+.Toastify__toast--close-on-click {
+  cursor: auto !important;
+}
+
 .modal-body, .modal-footer {
   justify-content: center;
   align-items: center;
@@ -13933,6 +13937,7 @@ img {
 
 .Toastify__toast {
   border: .5px solid #2e8b5726;
+  width: max-content !important;
   box-shadow: 0 0 50px #0000001a, 0 0 25px #0000000d !important;
 }
 

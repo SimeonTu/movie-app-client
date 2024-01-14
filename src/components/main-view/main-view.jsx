@@ -41,7 +41,7 @@ export default MainView = () => {
           return {
             id: movie._id,
             title: movie.Title,
-
+            description: movie.Description,
             genre: movie.Genre,
             director: movie.Director,
             releaseYear: movie.ReleaseYear,
@@ -77,25 +77,6 @@ export default MainView = () => {
 
   function onMovieClick(newSelectedMovie) {
     setSelectedMovie(newSelectedMovie)
-  }
-
-  // Function to check for similar movies after a movie card is opened
-  const similarMovies = (selectedMovie) => {
-    if (selectedMovie == null) {
-      return ["No similar movies found"]
-    }
-
-    //array of movies with the same genre
-    let similarMoviesArr = movies.filter((movie) => {
-      for (let i = 0; i < 3; i++) { //only show up to 3 movies
-        if (
-          movie.genre.Name == selectedMovie.genre.Name &&
-          movie.title != selectedMovie.title
-        ) return true;
-      }
-    })
-
-    return similarMoviesArr
   }
 
   return (
@@ -207,26 +188,14 @@ export default MainView = () => {
                   <div>Loading movie...</div>
                 ) : (
 
-                  <>
-                    <Col className="my-auto" md={8}>
-                      <MovieView
-                        style={{ border: "1px solid green" }}
-                        movieData={movies}
-                        onBackClick={() => setSelectedMovie(null)}
-                        user={user}
-                        token={token}
-                      />
-                    </Col>
-                    <hr />
-                    <h2>Similar Movies</h2>
-                    {similarMovies(selectedMovie).map((movie) => (
-                      <MovieCard
-                        key={movie.id}
-                        movieData={movie}
-                        onMovieClick={onMovieClick}
-                      />
-                    ))}
-                  </>
+                  <MovieView
+                    style={{ border: "1px solid green" }}
+                    movieData={movies}
+                    onBackClick={() => setSelectedMovie(null)}
+                    user={user}
+                    token={token}
+                    onMovieClick={onMovieClick}
+                  />
 
                 )}
               </>
@@ -256,9 +225,7 @@ export default MainView = () => {
                         <MovieCard
                           key={movie.id}
                           movieData={movie}
-                          onMovieClick={(newSelectedMovie) => {
-                            setSelectedMovie(newSelectedMovie);
-                          }}
+                          onMovieClick={onMovieClick}
                         />
                       </Col>
                     ))}
