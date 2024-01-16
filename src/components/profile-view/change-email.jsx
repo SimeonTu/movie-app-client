@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Card, CardGroup, Container, Col, Row } from "react-bootstrap";
-import { Link, useOutletContext } from "react-router-dom"
+import { Link } from "react-router-dom"
 import bcrypt from 'bcryptjs'
-import InfoCard from './info-card';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
 import { clearProfile } from "../../redux/reducers/profile";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../redux/reducers/user';
 
 
 export default ChangeEmail = () => {
 
     const dispatch = useDispatch()
 
-    const [onBackClick, user] = useOutletContext();
+    // const [onBackClick, user] = useOutletContext();
+
+    const user = useSelector(state => state.user.userObj)
 
     const [inpurPassword, setInputPassword] = useState("");
     const [updatedEmail, setUpdatedEmail] = useState("");
@@ -22,7 +24,7 @@ export default ChangeEmail = () => {
     const [newEmailConfirm, setNewEmailConfirm] = useState("");
 
     const [oldPassError, setOldPassError] = useState("");
-    const [wrongPassError, setCurrentPassError] = useState("");
+    const [wrongPassError, setWrongPassError] = useState("");
     const [invalidEmailError, setInvalidEmailError] = useState("");
     const [mismatchEmailError, setMismatchEmailError] = useState("");
     const [sameEmailError, setSameEmailError] = useState("");
@@ -45,32 +47,32 @@ export default ChangeEmail = () => {
         checkPassword();
         checkEmail();
 
-        if (success) {
-            console.log("success!!!");
-            setSuccess(false)
-            successToast();
-            clearErrors()
-        }
-        if (wrongPassError) {
-            console.log("old password error");
-            wrongPassToast();
-            clearErrors()
-        }
-        if (invalidEmailError) {
-            console.log("invalid email error");
-            invalidEmailToast()
-            clearErrors()
-        }
-        if (mismatchEmailError) {
-            console.log("new email error");
-            mismatchEmailsToast();
-            clearErrors()
-        }
-        if (sameEmailError) {
-            console.log("same email error");
-            sameEmailAsOldToast();
-            clearErrors()
-        }
+        // if (success) {
+        //     console.log("success!!!");
+        //     setSuccess(false)
+        //     successToast();
+        //     clearErrors()
+        // }
+        // if (wrongPassError) {
+        //     console.log("old password error");
+        //     wrongPassToast();
+        //     clearErrors()
+        // }
+        // if (invalidEmailError) {
+        //     console.log("invalid email error");
+        //     invalidEmailToast()
+        //     clearErrors()
+        // }
+        // if (mismatchEmailError) {
+        //     console.log("new email error");
+        //     mismatchEmailsToast();
+        //     clearErrors()
+        // }
+        // if (sameEmailError) {
+        //     console.log("same email error");
+        //     sameEmailAsOldToast();
+        //     clearErrors()
+        // }
 
         if (inpurPassword
             && newEmail
@@ -85,10 +87,22 @@ export default ChangeEmail = () => {
             setSubmitButton(false)
         }
 
-    }, [updatedEmail, inpurPassword, newEmail, newEmailConfirm, success, oldPassError, wrongPassError, invalidEmailError, mismatchEmailError, sameEmailError, errors.newEmail, errors.newEmailConfirm])
+    }, [updatedEmail,
+        inpurPassword,
+        newEmail,
+        newEmailConfirm,
+        // success,
+        // oldPassError,
+        // wrongPassError,
+        // invalidEmailError,
+        // mismatchEmailError,
+        // sameEmailError,
+        errors.newEmail,
+        errors.newEmailConfirm,
+    ])
 
     function clearErrors() {
-        setCurrentPassError(false)
+        setWrongPassError(false)
         setInvalidEmailError(false)
         setMismatchEmailError(false)
         setSameEmailError(false)
@@ -121,6 +135,12 @@ export default ChangeEmail = () => {
 
     const sameEmailAsOldToast = () => {
         toast.warn("New email can't be the same as your old email.", {
+            position: toast.POSITION.TOP_CENTER
+        });
+    };
+
+    const emailInUseToast = () => {
+        toast.warn("This email is already in use. Please use a different email address.", {
             position: toast.POSITION.TOP_CENTER
         });
     };
@@ -227,19 +247,15 @@ export default ChangeEmail = () => {
 
         }
 
-
         console.log("end breakpoint");
     }
 
-
-
-
-
+    
     const handleSubmit = (event) => {
 
         event.preventDefault()
 
-        async function fetchData() {
+        async function updateEmail() {
             //heroku own CORS Anywhere server prefixed before API url
             let newEmailVar = await fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -253,18 +269,22 @@ export default ChangeEmail = () => {
 
                     if (bcrypt.compareSync(inpurPassword, data.Password) == false) {
                         console.log("Old password doesn't match")
-                        setCurrentPassError(true)
+                        // setWrongPassError(true)
+                        wrongPassToast();
                         return
                     } else if (newEmail != newEmailConfirm) {
                         console.log("New emails don't match")
-                        setMismatchEmailError(true)
+                        // setMismatchEmailError(true)
+                        mismatchEmailsToast()
                         return
                     } else if (errors.newEmail == "Please use a valid email format" || errors.newEmailConfirm == "Please use a valid email format") {
-                        setInvalidEmailError(true)
+                        // setInvalidEmailError(true)
+                        invalidEmailToast()
                         return
                     } else if (data.Email == newEmail && data.Email == newEmailConfirm) {
                         console.log("New email can't be same as old")
-                        setSameEmailError(true)
+                        // setSameEmailError(true)
+                        sameEmailAsOldToast()
                         return
                     } else if (bcrypt.compareSync(inpurPassword, data.Password) == true
                         && errors.newEmail == null && errors.newEmailConfirm == null && oldPassError == null) {
@@ -287,15 +307,22 @@ export default ChangeEmail = () => {
                     }
                 }).then((response) => response.json())
                     .then((data) => {
+                        if (data.error) {
+                            if (data.error.codeName == "DuplicateKey") {
+                                emailInUseToast()
+                                return
+                            }
+                        }
                         console.log(data)
                         clearErrors()
-                        setSuccess(true)
+                        dispatch(setUser(data))
+                        successToast();
                     })
             }
 
         }
 
-        fetchData()
+        updateEmail()
 
     }
 

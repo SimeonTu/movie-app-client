@@ -7,7 +7,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
 import { clearProfile } from "../../redux/reducers/profile";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, setToken } from '../../redux/reducers/user';
 
 const clearProf = clearProfile;
 
@@ -15,7 +16,9 @@ export default ChangeUsername = () => {
 
     const dispatch = useDispatch()
 
-    const [onBackClick, onLoggedOut, user] = useOutletContext();
+    // const [onBackClick, onLoggedOut, user] = useOutletContext();
+
+    const user = useSelector(state => state.user.userObj)
 
     const [currentPassword, setCurrentPassword] = useState("");
     const [newUsername, setNewUsername] = useState("");
@@ -74,33 +77,14 @@ export default ChangeUsername = () => {
         }
     }
 
-    useEffect(() => {
+    // Function to log the user out after changing password
+    const onLoggedOut = () => {
+        dispatch(setUser(null));
+        dispatch(setToken(null));
+        localStorage.clear()
+    }
 
-        if (currentPassword && newUsername && !usernameError && !passError && user.Username != newUsername) {
-            console.log("current pass:", currentPassword);
-            console.log("new username:", newUsername);
-            console.log("user.Username:", user.Username);
-            console.log("username err:", usernameError);
-
-            setSubmitButton(true)
-        } else {
-            setSubmitButton(false)
-        }
-
-        if (success) {
-            console.log("success!!");
-            successToast()
-        }
-
-        if (warn) {
-            console.log("warn!!");
-            wrongPassToast()
-        }
-
-    }, [currentPassword, newUsername, success, warn])
-
-
-
+    // Handle form submit
     const handleSubmit = (event) => {
 
         event.preventDefault()
@@ -119,7 +103,7 @@ export default ChangeUsername = () => {
 
                     if (bcrypt.compareSync(currentPassword, data.Password) == false) {
                         console.log("Old password doesn't match")
-                        setWarn(true)
+                        wrongPassToast()
                     } else if (bcrypt.compareSync(currentPassword, data.Password) == true) {
                         console.log("success!");
                         return newUsername
@@ -140,9 +124,13 @@ export default ChangeUsername = () => {
                 }).then((response) => response.json())
                     .then((data) => {
                         console.log(data)
-                        setCurrentPassError(false)
-                        setSuccess(true)
-                        setTimeout(onLoggedOut, 4000)
+                        // setCurrentPassError(false)
+                        // setSuccess(true)
+                        successToast()
+                        setTimeout(() => {
+                            onLoggedOut()
+                            dispatch(clearProfile())
+                        }, 4000)
                     })
             }
 
@@ -151,6 +139,31 @@ export default ChangeUsername = () => {
         fetchData()
 
     }
+
+    useEffect(() => {
+
+        if (currentPassword && newUsername && !usernameError && !passError && user.Username != newUsername) {
+            console.log("current pass:", currentPassword);
+            console.log("new username:", newUsername);
+            console.log("user.Username:", user.Username);
+            console.log("username err:", usernameError);
+
+            setSubmitButton(true)
+        } else {
+            setSubmitButton(false)
+        }
+
+        // if (success) {
+        //     console.log("success!!");
+        //     successToast()
+        // }
+
+        // if (warn) {
+        //     console.log("warn!!");
+        //     wrongPassToast()
+        // }
+
+    }, [currentPassword, newUsername])
 
     return (
         <Container>

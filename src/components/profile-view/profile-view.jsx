@@ -44,10 +44,10 @@ export default ProfileView = ({ onMovieClick }) => {
 
 
         async function bruh() {
-            let userdata = await fetchUserData()
+            // let userdata = await fetchUserData()
 
             let favMovies = movies.filter(movie => {
-                if (userdata.FavoriteMovies.includes(movie.id)) {
+                if (user.FavoriteMovies.includes(movie.id)) {
                     console.log("yep")
                     return movie
                 }
@@ -74,7 +74,7 @@ export default ProfileView = ({ onMovieClick }) => {
         }
 
 
-    }, [movieData, refresh])
+    }, [movieData, refresh, user])
 
 
     async function fetchUserData() {
@@ -266,7 +266,7 @@ export default ProfileView = ({ onMovieClick }) => {
                                     </Form.Label>
                                     <Form.Control
                                         id='disabledEmail'
-                                        placeholder={fetchedUser.Email}
+                                        placeholder={user.Email}
                                         disabled
                                     />
                                 </Form.Group>
@@ -278,7 +278,7 @@ export default ProfileView = ({ onMovieClick }) => {
                                     <Form.Control
                                         id='disabledBirthday'
                                         // Using the moment.js library to format birthday date
-                                        placeholder={moment(new Date(birthday)).format('DD-MMM-YYYY')}
+                                        placeholder={moment(new Date(user.Birthday)).format('DD-MMM-YYYY')}
                                         disabled
                                     />
                                 </Form.Group>

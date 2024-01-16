@@ -8,24 +8,28 @@ $primary: SeaGreen;
     --toastify-color-light: honeydew !important;
 }
 
+.Toastify__toast {
+    border: 0.5px solid rgba(46, 139, 87, 0.15);
+    box-shadow: 0 0 50px #0000001a, 0 0 25px #0000000d !important;
+    width: max-content !important;
+
+    p {
+        margin: 0
+    }
+
+}
+
 .Toastify__toast--close-on-click {
     cursor: auto !important;
 }
 
-.Toastify__toast-container--top-center {
+.Toastify__toast-container--top-center {}
 
-}
-
-.modal-body, .modal-footer {
+.modal-body,
+.modal-footer {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.Toastify__toast {
-    border: 0.5px solid rgba(46,139,87,0.15);
-    box-shadow: 0 0 50px #0000001a, 0 0 25px #0000000d !important;
-    width: max-content !important;
 }
 
 .Toastify__toast--warning {

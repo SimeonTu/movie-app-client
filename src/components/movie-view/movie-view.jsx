@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from "react-redux";
 
-export default MovieView = ({ onBackClick, onMovieClick }) => {
+export default MovieView = ({ onMovieClick }) => {
 
   const user = useSelector((state) => state.user.userObj)
   const token = useSelector(state => state.user.token);
@@ -26,30 +26,30 @@ export default MovieView = ({ onBackClick, onMovieClick }) => {
 
     setMovieFavorited(null)
 
-    if (user) {
+    // if (user) {
 
-      console.log(user);
+    //   console.log(user);
 
-      // Getting user info
-      fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      })
-        .then((response) => {
-          return response.json()
-        })
-        .then((data) => {
+    //   // Getting user info
+    //   fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
+    //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    //   })
+    //     .then((response) => {
+    //       return response.json()
+    //     })
+    //     .then((data) => {
 
-          // console.log(user.FavoriteMovies)
-          if (data.FavoriteMovies.includes(currentMovie.id)) {
-            console.log("user has movie in their favs:", data)
-            setMovieFavorited(true)
-            console.log("moviefavorited:", movieFavorited);
-          } else {
-            setMovieFavorited(false)
-            console.log("moviefavorited:", movieFavorited);
-          }
-        })
+    // console.log(user.FavoriteMovies)
+    if (user.FavoriteMovies.includes(currentMovie.id)) {
+      console.log("user has movie in their favs:", data)
+      setMovieFavorited(true)
+      console.log("moviefavorited:", movieFavorited);
+    } else {
+      setMovieFavorited(false)
+      console.log("moviefavorited:", movieFavorited);
     }
+    // })
+    // }
 
     if (movies.length > 0) {
       console.log("yessir");

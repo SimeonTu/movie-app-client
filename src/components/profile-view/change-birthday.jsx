@@ -8,17 +8,20 @@ import 'react-toastify/dist/ReactToastify.css';
 import "./change-birthday.scss";
 import "./profile-view.scss";
 import { clearProfile } from "../../redux/reducers/profile";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../redux/reducers/user';
 
 
 export default ChangeBirthday = () => {
 
     const dispatch = useDispatch()
 
-    const [onBackClick, user, oldBirth] = useOutletContext();
+    // const [onBackClick, user, oldBirth] = useOutletContext();
 
-    const [oldBirthday, setOldBirthday] = useState(oldBirth);
-    const [newBirthday, setNewBirthday] = useState(oldBirth);
+    const user = useSelector(state => state.user.userObj)
+
+    const [oldBirthday, setOldBirthday] = useState(user.Birthday);
+    const [newBirthday, setNewBirthday] = useState(user.Birthday);
 
     const [success, setSuccess] = useState("")
     const [submitButton, setSubmitButton] = useState(false);
@@ -60,7 +63,7 @@ export default ChangeBirthday = () => {
 
         event.preventDefault()
 
-        async function fetchData() {
+        async function updateBirthday() {
 
             fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
                 method: "PUT",
@@ -75,12 +78,13 @@ export default ChangeBirthday = () => {
                 .then((data) => {
                     console.log(data)
                     setOldBirthday(newBirthday)
+                    dispatch(setUser(data))
                     setSuccess(true)
 
                 })
         }
 
-        fetchData()
+        updateBirthday()
 
     }
 

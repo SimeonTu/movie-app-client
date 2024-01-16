@@ -7,14 +7,17 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
 import { clearProfile } from "../../redux/reducers/profile";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, setToken } from '../../redux/reducers/user';
 
 
 export default ChangePassword = () => {
 
     const dispatch = useDispatch()
 
-    const [onBackClick, onLoggedOut, user] = useOutletContext();
+    // const [onBackClick, onLoggedOut, user] = useOutletContext();
+
+    const user = useSelector(state => state.user.userObj)
 
     const [inputPassword, setInputPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -49,21 +52,21 @@ export default ChangePassword = () => {
             successToast();
             clearErrors()
         }
-        if (wrongPassError) {
-            console.log("old password error");
-            wrongPassToast();
-            clearErrors()
-        }
-        if (mismatchPassError) {
-            console.log("mismatch pass error");
-            mismatchPasswordsToast();
-            clearErrors()
-        }
-        if (samePassError) {
-            console.log("same pass error");
-            samePassAsOldToast();
-            clearErrors()
-        }
+        // if (wrongPassError) {
+        //     console.log("old password error");
+        //     wrongPassToast();
+        //     clearErrors()
+        // }
+        // if (mismatchPassError) {
+        //     console.log("mismatch pass error");
+        //     mismatchPasswordsToast();
+        //     clearErrors()
+        // }
+        // if (samePassError) {
+        //     console.log("same pass error");
+        //     samePassAsOldToast();
+        //     clearErrors()
+        // }
 
         // if (inputPassword
         //     && newPassword
@@ -77,7 +80,17 @@ export default ChangePassword = () => {
         //     setSubmitButton(false)
         // }
 
-    }, [inputPassword, newPassword, newPasswordConfirm, success, oldPassError, wrongPassError, mismatchPassError, samePassError, errors.newPass, errors.newPassConfirm])
+    }, [inputPassword,
+        newPassword,
+        newPasswordConfirm,
+        success,
+        // oldPassError,
+        // wrongPassError,
+        // mismatchPassError,
+        // samePassError,
+        errors.newPass,
+        errors.newPassConfirm
+    ])
 
     function clearErrors() {
         setWrongPassError(false)
@@ -194,11 +207,20 @@ export default ChangePassword = () => {
         console.log("end breakpoint");
     }
 
+    // Function to log the user out after changing password
+    const onLoggedOut = () => {
+        dispatch(setUser(null));
+        dispatch(setToken(null));
+        localStorage.clear()
+    }
+
+
+    // Handle form submit
     const handleSubmit = (event) => {
 
         event.preventDefault()
 
-        async function fetchData() {
+        async function updatePassword() {
             //heroku own CORS Anywhere server prefixed before API url
             let newPass = await fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -211,11 +233,14 @@ export default ChangePassword = () => {
                     // and return newPassword if both newPassword fields match
 
                     if (bcrypt.compareSync(inputPassword, data.Password) == false) {
-                        setWrongPassError(true)
+                        // setWrongPassError(true)
+                        wrongPassToast();
                     } else if (newPassword != newPasswordConfirm) {
-                        setMismatchPassError(true)
+                        // setMismatchPassError(true)
+                        mismatchPasswordsToast()
                     } else if (inputPassword == newPassword) {
-                        setSamePassError(true)
+                        // setSamePassError(true)
+                        samePassAsOldToast()
                     } else if (bcrypt.compareSync(inputPassword, data.Password) == true
                         && newPassword == newPasswordConfirm) {
                         console.log("success!");
@@ -237,15 +262,20 @@ export default ChangePassword = () => {
                 }).then((response) => response.json())
                     .then((data) => {
                         console.log(data)
-                        clearErrors()
-                        setSuccess(true)
-                        setTimeout(onLoggedOut, 3000)
+                        // clearErrors()
+                        // setSuccess(true)
+                        successToast();
+                        setTimeout(() => {
+                            onLoggedOut()
+                            dispatch(clearProfile())
+                        }, 4000)
+
                     })
             }
 
         }
 
-        fetchData()
+        updatePassword()
 
     }
 
