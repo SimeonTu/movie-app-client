@@ -7,23 +7,109 @@ import MovieCardPlaceholder from '../placeholders/movie-card-placeholder';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
+import { useSelector, useDispatch } from 'react-redux';
+// import { setFavoritesList } from "../../redux/reducers/movies";
+import { clearProfile, setChangeUsername, setChangePassword, setChangeEmail, setChangeBirthday } from "../../redux/reducers/profile";
+import { setUser, setToken } from '../../redux/reducers/user';
 
 
-export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, token, movieFetch }) => {
+export default ProfileView = ({ onMovieClick }) => {
 
+    const dispatch = useDispatch()
+        // dispatch(clearProfile())
 
+    const user = useSelector(state => state.user.userObj)
+    const token = useSelector(state => state.user.token)
     const [birthday, setBirthday] = useState(null);
-    const [movies, setMovies] = useState(movieData)
-
     const [fetchedUser, setFetchedUser] = useState("")
-    const [changeUsername, setChangeUsername] = useState(null);
-    const [changePassword, setChangePassword] = useState(null);
-    const [changeEmail, setChangeEmail] = useState(null);
-    const [changeBirthday, setChangeBirthday] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [refresh, setRefresh] = useState(true);
 
+    const [favoriteMovies, setFavoriteMovies] = useState("")
+    const movies = useSelector((state) => state.movies.list)
+    let movieData = movies
+
+    const changeUsername = useSelector(state => state.profile.changeUsername);
+    const changePassword = useSelector(state => state.profile.changePassword);
+    const changeEmail = useSelector(state => state.profile.changeEmail);
+    const changeBirthday = useSelector(state => state.profile.changeBirthday);
+
+    const [loading, setLoading] = useState(true);
+    const [refresh, setRefresh] = useState(false);
     const [show, setShow] = useState(false);
+
+    console.log("refresh:", refresh);
+
+    console.log(movies, movieData, favoriteMovies, "log", changeUsername, changePassword, changeEmail, changeBirthday);
+
+    useEffect(() => {
+
+
+        async function bruh() {
+            let userdata = await fetchUserData()
+
+            let favMovies = movies.filter(movie => {
+                if (userdata.FavoriteMovies.includes(movie.id)) {
+                    console.log("yep")
+                    return movie
+                }
+            })
+
+
+            setFavoriteMovies(favMovies)
+
+            // if movie data has loaded, remove placeholders
+            if (movieData.length != 0) {
+                // console.log(filteredMovies);
+                setLoading(false)
+            }
+
+        }
+
+        bruh();
+
+        // console.log(movieData)
+        // console.log(moviee)
+
+        if (refresh) {
+            bruh();
+        }
+
+
+    }, [movieData, refresh])
+
+
+    async function fetchUserData() {
+
+        let userData = await fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setFetchedUser(data)
+                // setLoading(false)
+                setBirthday(data.Birthday)
+                return data
+            })
+
+        return userData
+
+    }
+
+    // fetchUserData()
+
+    const onLoggedOut = () => {
+        dispatch(setUser(null));
+        dispatch(setToken(null));
+        localStorage.clear()
+    }
+
+    const onBackClick = () => {
+        clearProfile()
+        setLoading(true)
+        setRefresh(true)
+    }
+
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const handleDeleteAcc = () => {
@@ -49,78 +135,6 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
         });
     }
 
-
-    useEffect(() => {
-
-
-        async function bruh() {
-            let userdata = await fetchUserData()
-
-            let movieDataFiltered = movieData.filter(movie => {
-                if (userdata.FavoriteMovies.includes(movie.id)) {
-                    console.log("yep")
-                    return movie
-                }
-            })
-
-            setMovies(movieDataFiltered)
-
-            // if movie data has loaded, remove placeholders
-            if (movieData.length != 0) {
-                setLoading(false)
-            }
-
-        }
-
-        bruh();
-
-
-
-        console.log(movies);
-        // console.log(movieData)
-        // console.log(moviee)
-
-        if (refresh) {
-            bruh();
-        }
-
-
-    }, [movieData, refresh])
-
-
-
-
-    async function fetchUserData() {
-
-        let userData = await fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setFetchedUser(data)
-                // setLoading(false)
-                setBirthday(data.Birthday)
-                return data
-            })
-
-        return userData
-
-    }
-
-    // fetchUserData()
-
-
-    const onBackClick = () => {
-        setChangeUsername(false)
-        setChangeEmail(false)
-        setChangePassword(false)
-        setChangeBirthday(false)
-        setLoading(true)
-        setRefresh(true)
-    }
-
     return (
 
         <>
@@ -144,7 +158,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                         <Link className='me-3' to="change-username">
                             <Button onClick={() => {
                                 setRefresh(false)
-                                setChangeUsername(true)
+                                dispatch(setChangeUsername(true))
                             }} variant="primary">
                                 Change Username
                             </Button>
@@ -152,7 +166,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                         <Link className='me-3' to="change-password">
                             <Button onClick={() => {
                                 setRefresh(false)
-                                setChangePassword(true)
+                                dispatch(setChangePassword(true))
                             }} variant="primary">
                                 Change Password
                             </Button>
@@ -160,7 +174,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                         <Link className='me-3' to="change-email">
                             <Button onClick={() => {
                                 setRefresh(false)
-                                setChangeEmail(true)
+                                dispatch(setChangeEmail(true))
                             }} variant="primary">
                                 Change Email
                             </Button>
@@ -168,7 +182,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                         <Link className='me-3' to="change-birthday">
                             <Button onClick={() => {
                                 setRefresh(false)
-                                setChangeBirthday(true)
+                                dispatch(setChangeBirthday(true))
                             }} variant="primary">
                                 Change Birthday
                             </Button>
@@ -275,7 +289,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
-                                        {movies.length == 0 ? (
+                                        {movieData.length == 0 ? (
                                             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "435px" }}>
                                                 <span style={{ color: "gray", opacity: "0.5", fontSize: "2rem" }}>
                                                     <i><u>Nothing but crickets here...</u></i>
@@ -284,7 +298,7 @@ export default ProfileView = ({ user, onLoggedOut, movieData, onMovieClick, toke
                                         ) : (
                                             <>
                                                 {
-                                                    movies.map(movie => (
+                                                    favoriteMovies.map(movie => (
                                                         <Col key={movie.id} md={3} className="mb-5">
                                                             <MovieCard
                                                                 key={movie.id}

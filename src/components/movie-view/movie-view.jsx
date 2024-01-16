@@ -7,14 +7,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular, light, thin, duotone, icon } from '@fortawesome/fontawesome-svg-core/import.macro'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "./movie-view.scss";
+import { useSelector } from "react-redux";
 
-export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick }) => {
+export default MovieView = ({ onBackClick, onMovieClick }) => {
 
-  const { title } = useParams();
+  const user = useSelector((state) => state.user.userObj)
+  const token = useSelector(state => state.user.token);
+
+  const movies = useSelector((state) => state.movies.list)
+  const { paramsMovieTitle } = useParams();
   const navigate = useNavigate();
 
-  const currentMovie = movieData.find((movie) => movie.title === title);
+  const currentMovie = movies.find((movie) => movie.title === paramsMovieTitle);
   const [movieFavorited, setMovieFavorited] = useState(null);
   const [similarMovies, setSimilarMovies] = useState("");
 
@@ -22,30 +26,35 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
 
     setMovieFavorited(null)
 
-    // Getting user info
-    fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    })
-      .then((response) => {
-        return response.json()
-      })
-      .then((data) => {
+    if (user) {
 
-        // console.log(user.FavoriteMovies)
-        if (data.FavoriteMovies.includes(currentMovie.id)) {
-          console.log("user has movie in their favs:", data)
-          setMovieFavorited(true)
-          console.log("moviefavorited:", movieFavorited);
-        } else {
-          setMovieFavorited(false)
-          console.log("moviefavorited:", movieFavorited);
-        }
-      })
+      console.log(user);
 
-    if (movieData.length > 0) {
+      // Getting user info
+      fetch(`https://fathomless-everglades-10625-ad628eacb5b5.herokuapp.com/https://ifdbase-c6a1086fce3e.herokuapp.com/users/${user.Username}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      })
+        .then((response) => {
+          return response.json()
+        })
+        .then((data) => {
+
+          // console.log(user.FavoriteMovies)
+          if (data.FavoriteMovies.includes(currentMovie.id)) {
+            console.log("user has movie in their favs:", data)
+            setMovieFavorited(true)
+            console.log("moviefavorited:", movieFavorited);
+          } else {
+            setMovieFavorited(false)
+            console.log("moviefavorited:", movieFavorited);
+          }
+        })
+    }
+
+    if (movies.length > 0) {
       console.log("yessir");
-      console.log(movieData);
-      let similarMoviesArr = movieData.filter((movie) => {
+      console.log(movies);
+      let similarMoviesArr = movies.filter((movie) => {
         for (let i = 0; i < 3; i++) { //only show up to 3 movies
           if (
             movie.genre.Name == currentMovie.genre.Name &&
@@ -62,7 +71,7 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
 
     }
 
-  }, [currentMovie, movieData])
+  }, [user, currentMovie])
 
 
   const addToast = () => {
@@ -113,12 +122,6 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
 
   }
 
-  function toggleRefresh() {
-    if (refresh == true) setRefresh(false)
-    if (refresh == false) setRefresh(true)
-  }
-
-
   return (
 
     <Col className="my-auto" md={8} style={{ display: "flex", flexDirection: "column", width: "100vw" }}>
@@ -127,8 +130,8 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
 
       <div className="m-2 p-5 rounded" style={{ display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(46, 139, 87, .05)", border: "2px solid rgba(46, 139, 87, .5)", width: "100%" }}>
 
-        <div>
-          <img className="movie-poster rounded" style={{ boxShadow: "0 0 30px rgba(0,0,0,0.25)", scale: "1.2" }} src={currentMovie.image} />
+        <div style={{ width: "280px", boxShadow: "0 0 30px rgba(0,0,0,0.25)" }}>
+          <img style={{ width: "100%" }} className="movie-poster rounded" src={currentMovie.image} />
         </div>
 
         <div className="ms-5" style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
@@ -143,7 +146,7 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
           {
             currentMovie.featured ? (
               <>
-                <div className="mt-2 mb-2" style={{ color: "SeaGreen", }}>
+                <div className="mt-2" style={{ color: "SeaGreen", }}>
                   <i>
                     <span>
                       <b>This movie is featured!</b>
@@ -157,7 +160,7 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
             )
           }
 
-          <span><b>Genre:</b> {currentMovie.genre.Name}</span>
+          <span className="mt-2"><b>Genre:</b> {currentMovie.genre.Name}</span>
 
           <span><b>Director:</b> {currentMovie.director.Name}</span>
 
@@ -190,11 +193,11 @@ export default MovieView = ({ movieData, onBackClick, user, token, onMovieClick 
             )
           }
 
-          <Button variant="primary" className="back-button mb-3" style={{ cursor: "pointer", width: "max-content" }} onClick={() => {
-            onBackClick()
-            navigate("/")
-          }}>
-
+          <Button
+            variant="primary"
+            className="back-button mb-3"
+            style={{ cursor: "pointer", width: "max-content" }}
+            onClick={() => { navigate("/") }}>
             Back
           </Button>
 

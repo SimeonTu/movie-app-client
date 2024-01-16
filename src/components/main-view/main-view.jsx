@@ -10,26 +10,55 @@ import ChangePassword from "../profile-view/change-password";
 import ChangeEmail from "../profile-view/change-email";
 import ChangeBirthday from "../profile-view/change-birthday";
 import MovieCardPlaceholder from '../placeholders/movie-card-placeholder';
+import MovieList from "../movie-list/movie-list";
+import MovieFilter from "../movie-filter/movie-filter";
 import { Row, Col, Button } from "react-bootstrap";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setMovies, setSearchFilter } from "../../redux/reducers/movies";
+import { setUser, setToken } from "../../redux/reducers/user"
+
 
 export default MainView = () => {
+
+  const movies = useSelector((state) => state.movies.list)
+  const dispatch = useDispatch();
+
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser ? storedUser : null);
-  const [token, setToken] = useState(storedToken ? storedToken : null);
-  const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  const user = useSelector((state) => state.user.userObj)
+  const token = useSelector(state => state.user.token);
+
   const loopArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
   useEffect(() => {
+    console.log("user:", user, "\n\nstoredUser:", storedUser, "\n\ntoken:", token, "\n\nstoredToken:", storedToken);
+
+    // if (!user) {
+    //   if (storedUser) {
+    //     dispatch(setUser(storedUser))
+    //   } else {
+    //     console.log("uh oh no user");
+    //   }
+    // }
+
+    if (storedUser) {
+      dispatch(setUser(storedUser))
+    }
+
+    if (storedToken) {
+      dispatch(setToken(storedToken))
+    }
+
     if (!token) {
-      return;
+      return
     }
 
     fetchData()
 
   }, [token]);
+
+
 
   async function fetchData() {
     let moviesFromApi = await fetch("https://ifdbase-c6a1086fce3e.herokuapp.com/movies", {
@@ -69,23 +98,15 @@ export default MainView = () => {
           movie.image = `http://image.tmdb.org/t/p/w500${data.results[0].poster_path}`
         })
     })).then(() => {
-      setMovies(moviesFromApi)
+      dispatch(setMovies(moviesFromApi))
     })
     console.timeEnd("promise all")
 
   }
 
-  function onMovieClick(newSelectedMovie) {
-    setSelectedMovie(newSelectedMovie)
-  }
-
   return (
     <BrowserRouter>
-      <NavigationBar user={user} onLoggedOut={() => {
-        setUser(null)
-        setToken(null)
-        localStorage.clear()
-      }} ></NavigationBar>
+      <NavigationBar></NavigationBar>
       <Row className="justify-content-md-center">
         <Routes>
           <Route
@@ -114,10 +135,7 @@ export default MainView = () => {
                   <Navigate to="/" />
                 ) : (
                   <Col md={5}>
-                    <LoginView onLoggedIn={(user, token) => {
-                      setUser(user);
-                      setToken(token);
-                    }} />
+                    <LoginView />
                   </Col>
                 )}
               </>
@@ -133,16 +151,7 @@ export default MainView = () => {
                 {!user ? (
                   <Navigate to="/login" replace />
                 ) : (
-                  <ProfileView
-                    user={user}
-                    onLoggedOut={() => {
-                      setUser(null)
-                      setToken(null)
-                      localStorage.clear()
-                    }}
-                    movieData={movies}
-                    onMovieClick={onMovieClick}
-                    token={token} >
+                  <ProfileView>
                   </ProfileView>
                 )}
 
@@ -178,7 +187,7 @@ export default MainView = () => {
           </Route>
 
           <Route
-            path="/movies/:title"
+            path="/movies/:paramsMovieTitle"
             element={
 
               <>
@@ -190,11 +199,6 @@ export default MainView = () => {
 
                   <MovieView
                     style={{ border: "1px solid green" }}
-                    movieData={movies}
-                    onBackClick={() => setSelectedMovie(null)}
-                    user={user}
-                    token={token}
-                    onMovieClick={onMovieClick}
                   />
 
                 )}
@@ -212,6 +216,8 @@ export default MainView = () => {
                   <Navigate to="/login" replace />
                 ) : movies.length === 0 ? (
                   <>
+                    <MovieFilter />
+                    {/* MOVIE PLACEHOLDERS */}
                     {loopArr.map((item, key) => (
                       <Col key={key} s={2} className="mb-5">
                         <MovieCardPlaceholder></MovieCardPlaceholder>
@@ -220,15 +226,7 @@ export default MainView = () => {
                   </>
                 ) : (
                   <>
-                    {movies.map((movie) => (
-                      <Col key={movie.id} s={2} className="mb-5">
-                        <MovieCard
-                          key={movie.id}
-                          movieData={movie}
-                          onMovieClick={onMovieClick}
-                        />
-                      </Col>
-                    ))}
+                    <MovieList />
                   </>
                 )}
               </>

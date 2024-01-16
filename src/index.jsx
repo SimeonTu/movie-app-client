@@ -1,18 +1,18 @@
 import { createRoot } from 'react-dom/client';
-
 import Container from 'react-bootstrap/Container';
-
-// Import statement to indicate that you need to bundle `./index.scss`
+import { store } from "./redux/store";
+import { Provider } from "react-redux";
 import "./index.scss";
-
 import MainView from "./components/main-view/main-view";
 
 // Main component (will eventually use all the others)
 const IMFdApp = () => {
   return (
-    <Container>
-      <MainView />
-    </Container>
+    <Provider store={store}>
+      <Container>
+        <MainView />
+      </Container>
+    </Provider>
   )
 };
 

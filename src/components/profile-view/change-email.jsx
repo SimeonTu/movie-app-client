@@ -6,9 +6,13 @@ import InfoCard from './info-card';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
+import { clearProfile } from "../../redux/reducers/profile";
+import { useDispatch } from 'react-redux';
 
 
 export default ChangeEmail = () => {
+
+    const dispatch = useDispatch()
 
     const [onBackClick, user] = useOutletContext();
 
@@ -395,7 +399,7 @@ export default ChangeEmail = () => {
                                         <Button
                                             className='mt-4'
                                             variant='secondary'
-                                            onClick={onBackClick}>
+                                            onClick={() => dispatch(clearProfile())}>
                                             Back
                                         </Button>
                                     </Link>

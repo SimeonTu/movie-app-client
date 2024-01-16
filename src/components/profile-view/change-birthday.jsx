@@ -7,9 +7,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./change-birthday.scss";
 import "./profile-view.scss";
+import { clearProfile } from "../../redux/reducers/profile";
+import { useDispatch } from 'react-redux';
 
 
 export default ChangeBirthday = () => {
+
+    const dispatch = useDispatch()
 
     const [onBackClick, user, oldBirth] = useOutletContext();
 
@@ -156,7 +160,7 @@ export default ChangeBirthday = () => {
                                         <Button
                                             className='mt-4'
                                             variant='secondary'
-                                            onClick={onBackClick}>
+                                            onClick={() => dispatch(clearProfile())}>
                                             Back
                                         </Button>
                                     </Link>

@@ -1,7 +1,20 @@
 import { Navbar, Container, Nav } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { clearProfile } from "../../redux/reducers/profile";
 
-export default NavigationBar = ({ user, onLoggedOut }) => {
+import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser, setToken } from "../../redux/reducers/user";
+
+export default NavigationBar = () => {
+
+  const dispatch = useDispatch()
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const user = useSelector(state => state.user.userObj)
+  const onLoggedOut = () => {
+    dispatch(setUser(null));
+    dispatch(setToken(null));
+  };
 
   return (
     <Navbar bg="light" expand="lg">
@@ -30,13 +43,16 @@ export default NavigationBar = ({ user, onLoggedOut }) => {
                 <Nav.Link
                   as={Link}
                   onClick={() => {
-                    setChangeEmail(false)
-                    setChangePassword(false)
+                    clearProfile()
                   }}
                   to="/profile">
                   Profile
                 </Nav.Link>
-                <Nav.Link onClick={onLoggedOut}>Logout</Nav.Link>
+                <Nav.Link onClick={() => {
+
+                  localStorage.clear()
+                  onLoggedOut()
+                }}>Logout</Nav.Link>
               </>
             )}
           </Nav>

@@ -1,9 +1,23 @@
 import { useState } from "react";
 import { Button, Form, Card, CardGroup, Container, Col, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, setToken } from "../../redux/reducers/user";
 
-const LoginView = ({ onLoggedIn }) => {
+const LoginView = () => {
+
+    const dispatch = useDispatch();
+
+    // const userr = useSelector(state => state.user.user)
+    // const tokenn = useSelector(state => state.user.token)
+
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
+    const onLoggedIn = (user, token) => {
+
+
+    }
 
     const handleSubmit = (event) => {
         // this prevents the default behavior of the form which is to reload the entire page
@@ -27,15 +41,18 @@ const LoginView = ({ onLoggedIn }) => {
             .then((data) => {
                 console.log("Login response: ", data);
                 if (data.user) {
+                    dispatch(setUser(data.user));
+                    dispatch(setToken(data.token));
                     localStorage.setItem("user", JSON.stringify(data.user));
                     localStorage.setItem("token", data.token)
-                    onLoggedIn(data.user, data.token);
+
+                    // console.log(userr, tokenn);
                 } else {
                     alert("Invalid username or password.");
                 }
             })
             .catch((e) => {
-                alert(e);
+                console.log(e);
             });
     }
 
