@@ -12,8 +12,6 @@ You can find the page for the backend of the web app [here](https://github.com/S
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Objective
 
