@@ -1,25 +1,30 @@
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { clearProfile } from "../../redux/reducers/profile";
-
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, setToken } from "../../redux/reducers/user";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { icon } from '@fortawesome/fontawesome-svg-core/import.macro'
 
 export default NavigationBar = () => {
 
   const dispatch = useDispatch()
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
   const user = useSelector(state => state.user.userObj)
+  
   const onLoggedOut = () => {
     dispatch(setUser(null));
     dispatch(setToken(null));
   };
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar className="rounded-bottom" style={{ backgroundColor: "SeaGreen" }} data-bs-theme="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">
+        <Navbar.Brand style={{ fontSize: "1.75rem" }} as={Link} to="/">
+          <FontAwesomeIcon
+            icon={icon({ name: 'film', family: 'classic', style: 'solid' })}
+            className="me-1"
+          />
           IFDb
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -37,7 +42,7 @@ export default NavigationBar = () => {
             )}
             {user && (
               <>
-                <Nav.Link as={Link} to="/">
+                <Nav.Link data-toggle="button" as={Link} to="/">
                   Home
                 </Nav.Link>
                 <Nav.Link

@@ -1,11 +1,27 @@
 $primary: SeaGreen;
 
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
+.navbar-nav {
+    --bs-nav-link-color: white;
+    // --bs-navbar-active-color: red !important;
+}
+
+.btn-primary {
+    --bs-btn-color: white;
+    --bs-btn-hover-color: white;
+    --bs-btn-active-color: white;
+}
+
+
 :root {
     --toastify-color-success: rgb(0, 79, 0) !important;
     // --toastify-color-warn: var(--toastifiy-color-warn) !important;
     // --toastify-color-progress-warning: SeaGreen !important;
     --toastify-text-color-light: SeaGreen !important;
     --toastify-color-light: honeydew !important;
+    // --bs-nav-link-color: white !important;
+    --bs-btn-color: red !important;
 }
 
 .Toastify__toast {
@@ -22,8 +38,6 @@ $primary: SeaGreen;
 .Toastify__toast--close-on-click {
     cursor: auto !important;
 }
-
-.Toastify__toast-container--top-center {}
 
 .modal-body,
 .modal-footer {

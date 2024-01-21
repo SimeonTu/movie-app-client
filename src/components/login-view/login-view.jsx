@@ -2,21 +2,20 @@ import { useState } from "react";
 import { Button, Form, Card, CardGroup, Container, Col, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, setToken } from "../../redux/reducers/user";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginView = () => {
 
     const dispatch = useDispatch();
 
-    // const userr = useSelector(state => state.user.user)
-    // const tokenn = useSelector(state => state.user.token)
-
-
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const onLoggedIn = (user, token) => {
-
-
+    const invalidToast = () => {
+        toast.error("Invalid username or password.", {
+            position: toast.POSITION.TOP_CENTER,
+        });
     }
 
     const handleSubmit = (event) => {
@@ -48,7 +47,8 @@ const LoginView = () => {
 
                     // console.log(userr, tokenn);
                 } else {
-                    alert("Invalid username or password.");
+                    invalidToast();
+                    // alert("Invalid username or password.");
                 }
             })
             .catch((e) => {
@@ -58,6 +58,9 @@ const LoginView = () => {
 
     return (
         <Container>
+
+            <ToastContainer limit={3} />
+
             <Row>
                 <Col>
                     <CardGroup>

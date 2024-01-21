@@ -8,7 +8,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
 import { useSelector, useDispatch } from 'react-redux';
-// import { setFavoritesList } from "../../redux/reducers/movies";
 import { clearProfile, setChangeUsername, setChangePassword, setChangeEmail, setChangeBirthday } from "../../redux/reducers/profile";
 import { setUser, setToken } from '../../redux/reducers/user';
 
@@ -140,7 +139,7 @@ export default ProfileView = ({ onMovieClick }) => {
         <>
             <ToastContainer />
 
-            <h1 className='profile-header mb-4'>User Profile of <b>{user.Username}</b></h1>
+            <h1 className='profile-header mb-3 mt-2'>User Profile of <b>{user.Username}</b></h1>
 
             {changeUsername ? (
                 <Outlet context={[onBackClick, onLoggedOut, user]} />

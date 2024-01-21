@@ -41,7 +41,7 @@ export default MovieView = ({ onMovieClick }) => {
 
     // console.log(user.FavoriteMovies)
     if (user.FavoriteMovies.includes(currentMovie.id)) {
-      console.log("user has movie in their favs:", data)
+      console.log("user has movie in their favs:")
       setMovieFavorited(true)
       console.log("moviefavorited:", movieFavorited);
     } else {
