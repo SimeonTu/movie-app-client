@@ -8,6 +8,7 @@ import { solid, regular, light, thin, duotone, icon } from '@fortawesome/fontawe
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from "react-redux";
+import { MovieCard } from "../movie-card/movie-card"
 
 export default MovieView = ({ onMovieClick }) => {
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Placeholder, Card, Row, Col, Modal } from 'react-bootstrap';
 import { Link, Outlet } from 'react-router-dom';
 import moment from 'moment';
-import MovieCard from '../movie-card/movie-card';
+import { MovieCard } from '../movie-card/movie-card';
 import MovieCardPlaceholder from '../placeholders/movie-card-placeholder';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,7 +15,7 @@ import { setUser, setToken } from '../../redux/reducers/user';
 export default ProfileView = ({ onMovieClick }) => {
 
     const dispatch = useDispatch()
-        // dispatch(clearProfile())
+    // dispatch(clearProfile())
 
     const user = useSelector(state => state.user.userObj)
     const token = useSelector(state => state.user.token)

@@ -1,4 +1,4 @@
-import MovieCard from "../movie-card/movie-card";
+import { MovieCard } from "../movie-card/movie-card";
 import MovieFilter from "../movie-filter/movie-filter";
 import { Col } from "react-bootstrap";
 import { useSelector } from "react-redux";

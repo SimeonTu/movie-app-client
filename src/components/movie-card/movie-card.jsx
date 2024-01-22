@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"
 
-export default MovieCard = ({ movieData }) => {
+export const MovieCard = ({ movieData }) => {
 
   const navigate = useNavigate()
 
