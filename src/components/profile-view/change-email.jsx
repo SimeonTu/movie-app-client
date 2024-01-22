@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../redux/reducers/user';
 
 
-export default ChangeEmail = () => {
+export const ChangeEmail = () => {
 
     const dispatch = useDispatch()
 

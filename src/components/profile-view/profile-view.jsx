@@ -3,7 +3,7 @@ import { Form, Button, Placeholder, Card, Row, Col, Modal } from 'react-bootstra
 import { Link, Outlet } from 'react-router-dom';
 import moment from 'moment';
 import { MovieCard } from '../movie-card/movie-card';
-import MovieCardPlaceholder from '../placeholders/movie-card-placeholder';
+import { MovieCardPlaceholder } from '../placeholders/movie-card-placeholder';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
@@ -12,7 +12,7 @@ import { clearProfile, setChangeUsername, setChangePassword, setChangeEmail, set
 import { setUser, setToken } from '../../redux/reducers/user';
 
 
-export default ProfileView = ({ onMovieClick }) => {
+export const ProfileView = ({ onMovieClick }) => {
 
     const dispatch = useDispatch()
     // dispatch(clearProfile())
@@ -22,7 +22,7 @@ export default ProfileView = ({ onMovieClick }) => {
     const [birthday, setBirthday] = useState(null);
     const [fetchedUser, setFetchedUser] = useState("")
 
-    const [favoriteMovies, setFavoriteMovies] = useState("")
+    const [favoriteMovies, setFavoriteMovies] = useState([])
     const movies = useSelector((state) => state.movies.list)
     let movieData = movies
 
@@ -42,6 +42,8 @@ export default ProfileView = ({ onMovieClick }) => {
     useEffect(() => {
 
 
+
+
         async function bruh() {
             // let userdata = await fetchUserData()
 
@@ -57,9 +59,11 @@ export default ProfileView = ({ onMovieClick }) => {
 
             // if movie data has loaded, remove placeholders
             if (movieData.length != 0) {
-                // console.log(filteredMovies);
+                // setFavoriteMovies([])
                 setLoading(false)
             }
+
+            console.log("favoriteMovies:",favoriteMovies);
 
         }
 
@@ -282,13 +286,13 @@ export default ProfileView = ({ onMovieClick }) => {
                                     />
                                 </Form.Group>
                             </Form>
-                            <Card className="p-0 mt-4" style={{}} >
+                            <Card className="p-0 mt-4">
                                 <Card.Header>
                                     <h4>Favorite movies</h4>
                                 </Card.Header>
                                 <Card.Body>
                                     <Row>
-                                        {movieData.length == 0 ? (
+                                        {favoriteMovies.length == 0 ? (
                                             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "435px" }}>
                                                 <span style={{ color: "gray", opacity: "0.5", fontSize: "2rem" }}>
                                                     <i><u>Nothing but crickets here...</u></i>

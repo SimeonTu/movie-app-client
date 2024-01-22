@@ -1,6 +1,6 @@
 import { Placeholder, Card, Col } from 'react-bootstrap';
 
-export default function MovieCardPlaceholder() {
+export function MovieCardPlaceholder() {
 
 
     return (

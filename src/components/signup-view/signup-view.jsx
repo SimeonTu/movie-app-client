@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const SignupView = () => {
+export const SignupView = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -152,5 +152,3 @@ const SignupView = () => {
         </Container>
     )
 }
-
-export default SignupView;

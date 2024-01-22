@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFilteredMovies } from "../../redux/reducers/movies";
 
 
-export default function MovieFilter() {
+export function MovieFilter() {
 
     const dispatch = useDispatch()
 

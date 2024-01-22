@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser, setToken } from '../../redux/reducers/user';
 
 
-export default ChangePassword = () => {
+export const ChangePassword = () => {
 
     const dispatch = useDispatch()
 

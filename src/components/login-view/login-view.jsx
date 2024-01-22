@@ -5,7 +5,7 @@ import { setUser, setToken } from "../../redux/reducers/user";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const LoginView = () => {
+export const LoginView = () => {
 
     const dispatch = useDispatch();
 
@@ -104,5 +104,3 @@ const LoginView = () => {
         </Container>
     );
 };
-
-export default LoginView;

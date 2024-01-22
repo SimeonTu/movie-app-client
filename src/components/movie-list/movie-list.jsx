@@ -1,9 +1,9 @@
 import { MovieCard } from "../movie-card/movie-card";
-import MovieFilter from "../movie-filter/movie-filter";
+import { MovieFilter } from "../movie-filter/movie-filter";
 import { Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
-export default MovieList = () => {
+export const MovieList = () => {
 
     const movies = useSelector((state) => state.movies.list);
     const filteredMovies = useSelector((state) => state.movies.filteredMovies)

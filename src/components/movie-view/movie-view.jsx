@@ -7,12 +7,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { solid, regular, light, thin, duotone, icon } from '@fortawesome/fontawesome-svg-core/import.macro'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MovieCard } from "../movie-card/movie-card"
+import { setUser } from "../../redux/reducers/user";
 
-export default MovieView = ({ onMovieClick }) => {
+export const MovieView = ({ onMovieClick }) => {
+
+  const dispatch = useDispatch()
 
   const user = useSelector((state) => state.user.userObj)
+  console.log("CURRENT USER OBJ:", user);
   const token = useSelector(state => state.user.token);
 
   const movies = useSelector((state) => state.movies.list)
@@ -25,7 +29,7 @@ export default MovieView = ({ onMovieClick }) => {
 
   useEffect(() => {
 
-    setMovieFavorited(null)
+    // setMovieFavorited(null)
 
     // if (user) {
 
@@ -40,7 +44,8 @@ export default MovieView = ({ onMovieClick }) => {
     //     })
     //     .then((data) => {
 
-    // console.log(user.FavoriteMovies)
+    console.log("user's fav movies:",user.FavoriteMovies)
+    console.log("current movie:", currentMovie);
     if (user.FavoriteMovies.includes(currentMovie.id)) {
       console.log("user has movie in their favs:")
       setMovieFavorited(true)
@@ -52,27 +57,24 @@ export default MovieView = ({ onMovieClick }) => {
     // })
     // }
 
+    // Setting similar movies section
     if (movies.length > 0) {
-      console.log("yessir");
-      console.log(movies);
       let similarMoviesArr = movies.filter((movie) => {
         for (let i = 0; i < 3; i++) { //only show up to 3 movies
           if (
             movie.genre.Name == currentMovie.genre.Name &&
             movie.title != currentMovie.title
           ) {
-            console.log("matched!!");
             return true;
           }
         }
       })
       setSimilarMovies(similarMoviesArr)
-      console.log(similarMoviesArr);
       //array of movies with the same genre
 
     }
 
-  }, [user, currentMovie])
+  }, [user, currentMovie, movieFavorited])
 
 
   const addToast = () => {
@@ -100,8 +102,10 @@ export default MovieView = ({ onMovieClick }) => {
       .then(response => response.json())
       .then(data => {
         console.log("movie added to favorites:", data)
+
         setMovieFavorited(true)
         addToast()
+        dispatch(setUser(data))
       })
 
   }
@@ -117,8 +121,10 @@ export default MovieView = ({ onMovieClick }) => {
       .then(response => response.json())
       .then(data => {
         console.log("movie removed to favorites:", data)
+        // dispatch(setUser(data))
         setMovieFavorited(false)
         removeToast()
+        dispatch(setUser(data))
       })
 
   }
@@ -171,14 +177,14 @@ export default MovieView = ({ onMovieClick }) => {
 
           {
             movieFavorited == true ? (
-              <a className="mb-3 mt-3" style={{ cursor: "pointer" }} onClick={removeFromFavs}>
+              <a className="mb-3 mt-3" style={{ cursor: "pointer", width: "max-content" }} onClick={removeFromFavs}>
                 <p className="m-0">
                   <FontAwesomeIcon className="pe-1" style={{ color: "red" }} size="xl" icon={solid("heart")} />
                   Remove from favorites
                 </p>
               </a>
             ) : movieFavorited == false ? (
-              <a className="mb-3 mt-3" style={{ cursor: "pointer" }} onClick={addToFavs}>
+              <a className="mb-3 mt-3" style={{ cursor: "pointer", width: "max-content" }} onClick={addToFavs}>
                 <p className="m-0">
                   <FontAwesomeIcon className="pe-1" size="xl" icon={regular("heart")} />
                   Add to favorites

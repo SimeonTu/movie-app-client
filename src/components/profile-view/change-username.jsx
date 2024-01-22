@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Card, CardGroup, Container, Col, Row } from "react-bootstrap";
-import { Link, useOutletContext } from "react-router-dom"
+import { Link } from "react-router-dom"
 import bcrypt from 'bcryptjs'
-import InfoCard from './info-card';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./profile-view.scss";
@@ -12,7 +11,7 @@ import { setUser, setToken } from '../../redux/reducers/user';
 
 const clearProf = clearProfile;
 
-export default ChangeUsername = () => {
+export const ChangeUsername = () => {
 
     const dispatch = useDispatch()
 

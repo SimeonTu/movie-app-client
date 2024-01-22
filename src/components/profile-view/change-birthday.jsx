@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../redux/reducers/user';
 
 
-export default ChangeBirthday = () => {
+export const ChangeBirthday = () => {
 
     const dispatch = useDispatch()
 
