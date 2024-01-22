@@ -18,7 +18,7 @@ import { setMovies, setSearchFilter } from "../../redux/reducers/movies";
 import { setUser, setToken } from "../../redux/reducers/user"
 
 
-export default MainView = () => {
+export const MainView = () => {
 
   const movies = useSelector((state) => state.movies.list)
   const dispatch = useDispatch();

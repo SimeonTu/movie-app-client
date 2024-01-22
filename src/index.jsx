@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import "./index.scss";
-import MainView from "./components/main-view/main-view";
+import { MainView } from "./components/main-view/main-view";
 
 // Main component (will eventually use all the others)
 const IMFdApp = () => {
