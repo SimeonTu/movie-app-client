@@ -14,7 +14,7 @@ export const MovieList = () => {
 
             {movies.length === 0 ? (
                 <Col>The list is empty!</Col>
-            ) : filteredMovies.length != 0 ? (
+            ) : filteredMovies.length > 0 && typeof filteredMovies == "object" ? (
                 filteredMovies.map((movie) => (
                     <Col key={movie.id} s={2} className="mb-5">
                         <MovieCard
@@ -24,7 +24,11 @@ export const MovieList = () => {
                     </Col>
                 ))
             ) : filteredMovies == "no movies found" ? (
-                <div>No movies found.</div>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "150px" }}>
+                    <span style={{ color: "gray", opacity: "0.5", fontSize: "2rem" }}>
+                        <i><u>Nothing but crickets here...</u></i>
+                    </span>
+                </div>
             ) : (
                 <>
                     {

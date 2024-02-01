@@ -124,11 +124,13 @@ export const SignupView = () => {
                                             Email:
                                         </Form.Label>
                                         <Form.Control
-                                            type="email"
+                                            type="text"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
+                                            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
                                             placeholder="Enter your email address"
+                                            title="Invalid email address"
                                         />
                                     </Form.Group>
                                     <Form.Group controlId="formBirthday">
