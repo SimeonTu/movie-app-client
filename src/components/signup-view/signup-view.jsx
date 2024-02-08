@@ -9,6 +9,23 @@ export const SignupView = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [birthday, setBirthday] = useState("");
+    const emailRegex = /^[a-zA-Z0-9!#\\&$%'*+=?^`{}|~_-](\.?[a-zA-Z0-9\\!#$&%'*+=?^`{}|~_-]){0,}@[a-zA-Z0-9]+\.(?!-)([a-zA-Z0-9]?((-?[a-zA-Z0-9]+)+\.(?!-))){0,}[a-zA-Z0-9]{2,8}$/g
+
+    const [errors, setErrors] = useState("");
+    const [invalidEmailError, setInvalidEmailError] = useState("");
+
+    useEffect(() => {
+
+        console.log(email, email.match(emailRegex));
+
+        if (email && email.match(emailRegex) === null) {
+            console.log(errors);
+            setErrors({ ...errors, email: "Please enter a valid email" })
+        } else {
+            setErrors({ ...errors, email: null })
+        }
+
+    }, [email, errors.email])
 
     const navigate = useNavigate();
 
@@ -26,7 +43,7 @@ export const SignupView = () => {
     }
 
     const userExistsToast = () => {
-        toast.warn(<p className="m-0"><center>Username already registered.<br />Please choose a different username.</center></p>, {
+        toast.warn(<p className="m-0">Username already registered.<br />Please choose a different username.</p>, {
             position: toast.POSITION.TOP_CENTER
         });
     }
@@ -37,8 +54,20 @@ export const SignupView = () => {
         });
     }
 
+    const invalidEmailToast = () => {
+        toast.warn(<p className="m-0">Please enter a valid email address.</p>, {
+            position: toast.POSITION.TOP_CENTER
+        });
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        // User has entered an invalid email
+        if (!!errors.email) {
+            invalidEmailToast();
+            return
+        }
 
         // Calculate user age
         let today = new Date();
@@ -134,11 +163,15 @@ export const SignupView = () => {
                                             type="text"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
+                                            isInvalid={!!errors.email}
                                             required
-                                            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                                            // pattern="^\[a\-zA\-Z0\-9!#\\&$%'*+=?^`\{\}|~_\-]\(\.?\[a\-zA\-Z0\-9\\!#$&%'*+=?^`\{\}|~_\-]\)\{0,\}@\[a\-zA\-Z0\-9]+\.\(?!\-\)\(\[a\-zA\-Z0\-9]?\(\(\-?\[a\-zA\-Z0\-9]+\)+\.\(?!\-\)\)\)\{0,\}\[a\-zA\-Z0\-9]\{2,8\}$"
                                             placeholder="Enter your email address"
                                             title="Invalid email address"
                                         />
+                                        <Form.Control.Feedback type='invalid'>
+                                            {errors.email}
+                                        </Form.Control.Feedback>
                                     </Form.Group>
                                     <Form.Group controlId="formBirthday">
                                         <Form.Label className="mb-0 mt-2">
