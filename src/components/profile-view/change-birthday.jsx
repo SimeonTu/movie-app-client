@@ -29,8 +29,7 @@ export const ChangeBirthday = () => {
     const notify = () => {
 
         toast.success("You've successfully updated your birthday!", {
-            position: toast.POSITION.TOP_CENTER,
-            autoClose: 99999
+            position: toast.POSITION.TOP_CENTER
         });
 
     };

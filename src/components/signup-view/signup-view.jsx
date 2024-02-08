@@ -10,20 +10,18 @@ export const SignupView = () => {
     const [email, setEmail] = useState("");
     const [birthday, setBirthday] = useState("");
 
-    const [success, setSuccess] = useState(false)
-    const [userExists, setUserExists] = useState(false)
-    const [emailExists, setEmailExists] = useState(false)
-
-    // useEffect(() => {
-    //     successToast()
-    // })
-
     const navigate = useNavigate();
 
     const successToast = () => {
         toast.success(<p className="m-0">You've successfully created your account!<br />You'll be redirected to the login page shortly.</p>, {
             position: toast.POSITION.TOP_CENTER,
             style: { width: "400px" }
+        });
+    }
+
+    const ageToast = () => {
+        toast.warn(<p className="m-0">You must be over 13 to register an account.</p>, {
+            position: toast.POSITION.TOP_CENTER
         });
     }
 
@@ -39,13 +37,24 @@ export const SignupView = () => {
         });
     }
 
-    function clearErrors() {
-        setUserExists(false)
-        setEmailExists(false)
-    }
-
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        // Calculate user age
+        let today = new Date();
+        let birthDate = new Date(birthday);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        let month = today.getMonth() - birthDate.getMonth();
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        // User is not old enough to register
+        if (age < 13) {
+            ageToast();
+            return;
+        }
+
 
         const data = {
             Username: username,
@@ -66,10 +75,8 @@ export const SignupView = () => {
                 if (data.error) {
                     if (data.error.includes("User")) {
                         userExistsToast()
-                        clearErrors()
                     } else if (data.error.includes("Email")) {
                         emailExistsToast()
-                        clearErrors()
                     }
                 } else {
                     successToast()
@@ -140,6 +147,8 @@ export const SignupView = () => {
                                         <Form.Control className="mb-2"
                                             type="date"
                                             value={birthday}
+                                            max={new Date().toISOString().split('T', 1)[0]}
+                                            onClick={(e) => e.currentTarget.showPicker()}
                                             onChange={(e) => setBirthday(e.target.value)}
                                             required
                                         />

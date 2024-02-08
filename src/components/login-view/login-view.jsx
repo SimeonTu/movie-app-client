@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser, setToken } from "../../redux/reducers/user";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Link } from "react-router-dom";
 
 export const LoginView = () => {
 
@@ -94,6 +95,8 @@ export const LoginView = () => {
                                             placeholder="Enter your password"
                                         />
                                     </Form.Group>
+
+                                    <Link style={{ display: "block" }} to="/signup">Don't have an account? Register here.</Link>
                                     <Button className="mt-3 mb-2" variant="primary" type="submit">Submit</Button>
                                 </Form>
                             </Card.Body>
