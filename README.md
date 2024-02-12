@@ -33,7 +33,7 @@ Build the client-side for the IFDb web app using React. This project complements
 
    ```bash
    git clone https://github.com/SimeonTu/movie-app-client
-   cd myflix-client
+   cd movie-app-client
    ```
 
 2. Install dependencies:
