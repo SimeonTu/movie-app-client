@@ -32,7 +32,7 @@ Build the client-side for the IFDb web app using React. This project complements
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/myflix-client
+   git clone https://github.com/SimeonTu/movie-app-client
    cd myflix-client
    ```
 
