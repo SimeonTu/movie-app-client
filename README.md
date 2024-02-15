@@ -6,6 +6,7 @@ IFDb is a web app for movie enthusiasts who want to access and save information 
 
 The goal of this project is to build the frontend for the IFDb web app and showcase skills in building a responsive and interactive user interface using React, based on a backend built with Node.js, Express and MongoDB.
 You can find the page for the backend of the web app [here](https://github.com/SimeonTu/movie-app).
+
 [Link to the live site](https://ifdbase.netlify.app/)
 
 ![IFDb home page](https://i.imgur.com/3h6tbfG.png)
